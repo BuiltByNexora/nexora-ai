@@ -11,6 +11,17 @@ export async function signInWithGoogle() {
   });
 }
 
+export async function signInWithGitHub() {
+  const supabase = createClient();
+
+  return supabase.auth.signInWithOAuth({
+    provider: "github",
+    options: {
+      redirectTo: `${window.location.origin}/auth/callback`,
+    },
+  });
+}
+
 export async function signInWithEmail(
   email: string,
   password: string,
@@ -23,11 +34,15 @@ export async function signInWithEmail(
   });
 }
 
-export async function signUpWithEmail(
-  email: string,
-  password: string,
-  displayName?: string,
-) {
+export async function signUpWithEmail({
+  name,
+  email,
+  password,
+}: {
+  name: string;
+  email: string;
+  password: string;
+}) {
   const supabase = createClient();
 
   return supabase.auth.signUp({
@@ -35,8 +50,9 @@ export async function signUpWithEmail(
     password,
     options: {
       data: {
-        display_name: displayName ?? "",
+        display_name: name,
       },
+      emailRedirectTo: `${window.location.origin}/auth/callback`,
     },
   });
 }
