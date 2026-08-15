@@ -3,6 +3,7 @@
 import { ArrowRight, Eye, EyeOff, Loader2 } from "lucide-react";
 import { useState } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 
 import {
   signInAsGuest,
@@ -15,6 +16,7 @@ export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState<"email" | "guest" | null>(null);
   const [error, setError] = useState("");
+  const searchParams = useSearchParams();
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -30,7 +32,9 @@ export function LoginForm() {
       return;
     }
 
-    window.location.href = "/";
+    const next = searchParams.get("next") || "/dashboard";
+
+    window.location.href = next.startsWith("/") ? next : "/dashboard";
   }
 
   async function handleGuest() {
@@ -45,7 +49,9 @@ export function LoginForm() {
       return;
     }
 
-    window.location.href = "/";
+    const next = searchParams.get("next") || "/dashboard";
+
+    window.location.href = next.startsWith("/") ? next : "/dashboard";
   }
 
   return (

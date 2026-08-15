@@ -3,12 +3,14 @@ import { createClient } from "@/lib/supabase/server";
 
 export async function GET(request: Request) {
   const requestUrl = new URL(request.url);
+
   const code = requestUrl.searchParams.get("code");
   const next = requestUrl.searchParams.get("next") ?? "/";
 
-  if (!next.startsWith("/")) {
-    return NextResponse.redirect(new URL("/", requestUrl.origin));
-  }
+  // Only allow internal paths.
+  // Prevent values such as //external-site.com from becoming open redirects.
+  const safeNext =
+    next.startsWith("/") && !next.startsWith("//") ? next : "/";
 
   if (!code) {
     return NextResponse.redirect(
@@ -28,5 +30,7 @@ export async function GET(request: Request) {
     );
   }
 
-  return NextResponse.redirect(new URL(next, requestUrl.origin));
+  return NextResponse.redirect(
+    new URL(safeNext, requestUrl.origin),
+  );
 }

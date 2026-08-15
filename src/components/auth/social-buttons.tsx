@@ -1,19 +1,35 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import {
   signInWithGitHub,
   signInWithGoogle,
 } from "@/lib/auth/auth";
 
-export function SocialButtons() {
+interface SocialButtonsProps {
+  next: string;
+}
+
+export function SocialButtons({ next }: SocialButtonsProps) {
   const [loading, setLoading] = useState<"google" | "github" | null>(null);
+
+  useEffect(() => {
+    function handlePageShow() {
+      setLoading(null);
+    }
+
+    window.addEventListener("pageshow", handlePageShow);
+
+    return () => {
+      window.removeEventListener("pageshow", handlePageShow);
+    };
+  }, []);
 
   async function handleGoogle() {
     setLoading("google");
 
-    const { error } = await signInWithGoogle();
+    const { error } = await signInWithGoogle(next);
 
     if (error) {
       console.error("Google sign-in error:", error);
@@ -24,7 +40,7 @@ export function SocialButtons() {
   async function handleGitHub() {
     setLoading("github");
 
-    const { error } = await signInWithGitHub();
+    const { error } = await signInWithGitHub(next);
 
     if (error) {
       console.error("GitHub sign-in error:", error);

@@ -4,6 +4,8 @@ import { ArrowLeft } from "lucide-react";
 import { AuthShell } from "@/components/auth/auth-shell";
 import { LoginForm } from "@/components/auth/login-form";
 import { SocialButtons } from "@/components/auth/social-buttons";
+import { Suspense } from "react";
+import { SocialButtonsWrapper } from "@/components/auth/social-buttons-wrapper";
 
 export default function LoginPage() {
   return (
@@ -45,7 +47,7 @@ export default function LoginPage() {
             </p>
           </div>
 
-          <SocialButtons />
+          <SocialButtonsWrapper />
 
           <div className="my-7 flex items-center gap-4">
             <div className="h-px flex-1 bg-white/10" />
@@ -53,7 +55,13 @@ export default function LoginPage() {
             <div className="h-px flex-1 bg-white/10" />
           </div>
 
-          <LoginForm />
+          <Suspense
+            fallback={
+              <div className="h-12 w-full animate-pulse rounded-xl bg-white/[0.04]" />
+            }
+          >
+            <LoginForm />
+          </Suspense>
 
           <p className="mt-7 text-center text-sm text-white/40">
             Don't have an account?{" "}

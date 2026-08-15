@@ -14,10 +14,11 @@ export async function updateSession(request: NextRequest) {
         getAll() {
           return request.cookies.getAll();
         },
+
         setAll(cookiesToSet) {
-          cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value),
-          );
+          cookiesToSet.forEach(({ name, value }) => {
+            request.cookies.set(name, value);
+          });
 
           supabaseResponse = NextResponse.next({
             request,
@@ -31,7 +32,39 @@ export async function updateSession(request: NextRequest) {
     },
   );
 
-  await supabase.auth.getClaims();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  const pathname = request.nextUrl.pathname;
+
+  const isAuthPage =
+    pathname === "/login" ||
+    pathname === "/signup" ||
+    pathname === "/forgot-password";
+
+  const isProtectedRoute =
+    pathname.startsWith("/dashboard");
+
+  // Not logged in → protected route → login
+  if (!user && isProtectedRoute) {
+    const loginUrl = request.nextUrl.clone();
+
+    loginUrl.pathname = "/login";
+    loginUrl.searchParams.set("next", pathname);
+
+    return NextResponse.redirect(loginUrl);
+  }
+
+  // Already logged in → auth pages → dashboard
+  if (user && isAuthPage) {
+    const dashboardUrl = request.nextUrl.clone();
+
+    dashboardUrl.pathname = "/dashboard";
+    dashboardUrl.search = "";
+
+    return NextResponse.redirect(dashboardUrl);
+  }
 
   return supabaseResponse;
 }

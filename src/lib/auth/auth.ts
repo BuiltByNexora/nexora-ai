@@ -1,23 +1,37 @@
 import { createClient } from "@/lib/supabase/client";
 
-export async function signInWithGoogle() {
+export async function signInWithGoogle(next = "/dashboard") {
   const supabase = createClient();
+
+  const safeNext =
+    next.startsWith("/") && !next.startsWith("//")
+      ? next
+      : "/dashboard";
 
   return supabase.auth.signInWithOAuth({
     provider: "google",
     options: {
-      redirectTo: `${window.location.origin}/auth/callback`,
+      redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(
+        safeNext,
+      )}`,
     },
   });
 }
 
-export async function signInWithGitHub() {
+export async function signInWithGitHub(next = "/dashboard") {
   const supabase = createClient();
+
+  const safeNext =
+    next.startsWith("/") && !next.startsWith("//")
+      ? next
+      : "/dashboard";
 
   return supabase.auth.signInWithOAuth({
     provider: "github",
     options: {
-      redirectTo: `${window.location.origin}/auth/callback`,
+      redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(
+        safeNext,
+      )}`,
     },
   });
 }
@@ -54,6 +68,22 @@ export async function signUpWithEmail({
       },
       emailRedirectTo: `${window.location.origin}/auth/callback`,
     },
+  });
+}
+
+export async function sendPasswordResetEmail(email: string) {
+  const supabase = createClient();
+
+  return supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${window.location.origin}/auth/callback?next=/reset-password`,
+  });
+}
+
+export async function updatePassword(password: string) {
+  const supabase = createClient();
+
+  return supabase.auth.updateUser({
+    password,
   });
 }
 
