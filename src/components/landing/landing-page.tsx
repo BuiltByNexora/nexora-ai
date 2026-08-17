@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { Navbar } from "./navbar";
+import { Footer } from "./footer";
 import {
   ArrowRight,
   Bot,
@@ -84,58 +86,8 @@ export default function Home() {
       </div>
 
       {/* Navigation */}
-      <header className="relative z-20 border-b border-white/[0.06]">
-        <div className="mx-auto flex h-20 max-w-7xl items-center justify-between px-6 lg:px-8">
-          <Link href="/" className="flex items-center gap-3">
-            <div className="grid size-9 place-items-center rounded-xl border border-blue-400/20 bg-blue-500/10 text-sm font-semibold text-blue-300 shadow-lg shadow-blue-500/10">
-              N
-            </div>
-
-            <span className="text-lg font-semibold tracking-tight">
-              Nexora
-            </span>
-          </Link>
-
-          <nav className="hidden items-center gap-8 md:flex">
-            <a
-              href="#features"
-              className="text-sm text-white/50 transition hover:text-white"
-            >
-              Features
-            </a>
-
-            <a
-              href="#about"
-              className="text-sm text-white/50 transition hover:text-white"
-            >
-              Why Nexora
-            </a>
-
-            <a
-              href="#start"
-              className="text-sm text-white/50 transition hover:text-white"
-            >
-              Get started
-            </a>
-          </nav>
-
-          <div className="flex items-center gap-3">
-            <Link
-              href="/login"
-              className="hidden rounded-xl px-4 py-2.5 text-sm font-medium text-white/70 transition hover:bg-white/[0.05] hover:text-white sm:block"
-            >
-              Sign in
-            </Link>
-
-            <Link
-              href="/signup"
-              className="rounded-xl border border-white/10 bg-white px-4 py-2.5 text-sm font-semibold text-black transition hover:bg-white/90"
-            >
-              Get started
-            </Link>
-          </div>
-        </div>
-      </header>
+      
+      <Navbar />
 
       {/* Hero */}
       <section className="relative z-10 mx-auto flex min-h-[calc(100vh-80px)] max-w-7xl flex-col items-center px-6 pt-20 text-center lg:px-8 lg:pt-28">
@@ -435,20 +387,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Footer */}
-      <footer className="relative z-10 border-t border-white/[0.06]">
-        <div className="mx-auto flex max-w-7xl flex-col gap-4 px-6 py-8 text-sm text-white/30 sm:flex-row sm:items-center sm:justify-between lg:px-8">
-          <div className="flex items-center gap-2">
-            <div className="grid size-7 place-items-center rounded-lg border border-white/10 bg-white/[0.04] text-xs font-semibold">
-              N
-            </div>
-
-            <span>Nexora</span>
-          </div>
-
-          <p>© 2026 Nexora. Built for what's next.</p>
-        </div>
-      </footer>
+      <Footer/ >
     </main>
   );
 }
