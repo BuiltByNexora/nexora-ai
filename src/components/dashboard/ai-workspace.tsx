@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { ChevronDown } from "lucide-react";
 
 import { AIComposer } from "@/components/dashboard/ai/ai-composer";
 import { AIConversation } from "@/components/dashboard/ai/ai-conversation";
@@ -89,6 +90,41 @@ export function AIWorkspace() {
   );
 
   const hasConversation = messages.length > 0;
+
+  /*
+  */
+
+  const bottomRef = useRef<HTMLDivElement>(null);
+
+  const [showScrollDown, setShowScrollDown] = useState(false);
+
+  useEffect(() => {
+    function handleScroll() {
+      const distanceFromBottom =
+        document.documentElement.scrollHeight -
+        window.scrollY -
+        window.innerHeight;
+
+      setShowScrollDown(distanceFromBottom > 300);
+    }
+
+    handleScroll();
+
+    window.addEventListener("scroll", handleScroll, {
+      passive: true,
+    });
+
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, []);
+
+  function scrollToBottom() {
+    bottomRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "end",
+    });
+  }
 
   /*
    * =============================================================
@@ -598,9 +634,22 @@ export function AIWorkspace() {
             }}
           </AIConversation>
 
+          <div ref={bottomRef} />
+
           {/* Composer */}
 
           <div className="sticky bottom-0 bg-[#03050b]/90 pb-5 pt-3 backdrop-blur-xl sm:pb-7">
+            {showScrollDown && (
+              <button
+                type="button"
+                onClick={scrollToBottom}
+                aria-label="Scroll to latest message"
+                className="absolute left-1/2 top-[-58px] z-30 grid size-12 -translate-x-1/2 place-items-center rounded-full border border-white/[0.12] bg-[#0b0f18]/95 text-white/70 shadow-xl shadow-black/30 backdrop-blur-xl transition hover:bg-[#111827] hover:text-white"
+              >
+                <ChevronDown className="size-5" />
+              </button>
+            )}
+
             <AIComposer
               message={message}
               setMessage={setMessage}
@@ -609,8 +658,7 @@ export function AIWorkspace() {
             />
 
             <p className="mt-2 text-center text-[10px] text-white/15">
-              Nexora can make mistakes. Review important
-              information before acting on it.
+              Nexora can make mistakes. Review important information before acting on it.
             </p>
           </div>
         </div>

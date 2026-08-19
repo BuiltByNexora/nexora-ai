@@ -72,7 +72,7 @@ export function AIMessage({
             />
           ) : (
             <>
-              <div className="w-fit max-w-full rounded-2xl rounded-br-md border border-blue-400/10 bg-blue-500/[0.08] px-4 py-3 text-sm leading-6 text-white/85 break-words">
+              <div className="w-fit max-w-[min(70vw,720px)] whitespace-pre-wrap break-words rounded-2xl rounded-br-md border border-blue-400/10 bg-blue-500/[0.08] px-4 py-3 text-sm leading-6 text-white/85">
                 {message.content}
               </div>
 
