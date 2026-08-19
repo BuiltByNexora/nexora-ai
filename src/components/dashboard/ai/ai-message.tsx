@@ -1,6 +1,12 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, Sparkles } from "lucide-react";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Sparkles,
+} from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 import { AIEditMessage } from "@/components/dashboard/ai/ai-edit-message";
 import { AIMessageActions } from "@/components/dashboard/ai/ai-message-actions";
@@ -24,12 +30,6 @@ type AIMessageProps = {
   onSaveEdit: (messageId: string) => void;
   onCopyMessage: (message: AIMessageData) => void;
 
-  /*
-   * Message version navigation.
-   *
-   * Example:
-   * ← 1 / 2 →
-   */
   version?: number;
   totalVersions?: number;
   onPreviousVersion?: () => void;
@@ -72,7 +72,7 @@ export function AIMessage({
             />
           ) : (
             <>
-              <div className="w-fit max-w-[min(70vw,720px)] whitespace-pre-wrap break-words rounded-2xl rounded-br-md border border-blue-400/10 bg-blue-500/[0.08] px-4 py-3 text-sm leading-6 text-white/85">
+              <div className="max-w-full min-w-0 break-words whitespace-pre-wrap text-sm leading-7 text-white/85">
                 {message.content}
               </div>
 
@@ -88,6 +88,7 @@ export function AIMessage({
       </div>
     );
   }
+
   /*
    * =============================================================
    * ASSISTANT MESSAGE
@@ -96,8 +97,9 @@ export function AIMessage({
 
   return (
     <div className="flex justify-start">
-      <div className="group max-w-[90%] sm:max-w-[80%]">
+      <div className="group min-w-0 max-w-[90%] sm:max-w-[80%]">
         {/* Assistant identity */}
+
         <div className="mb-2 flex items-center gap-2">
           <div className="grid size-7 place-items-center rounded-lg border border-blue-400/15 bg-blue-500/[0.07]">
             <Sparkles className="size-3.5 text-blue-300" />
@@ -108,18 +110,141 @@ export function AIMessage({
           </span>
         </div>
 
-        {/* Response */}
-        <div className="text-sm leading-7 text-white/70">
-          {message.content}
+        {/* =====================================================
+            MARKDOWN RESPONSE
+           ===================================================== */}
+
+        <div className="max-w-full min-w-0 break-words text-sm leading-7 text-white/70">
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            components={{
+              p: ({ children }) => (
+                <p className="mb-4 last:mb-0">
+                  {children}
+                </p>
+              ),
+
+              strong: ({ children }) => (
+                <strong className="font-semibold text-white">
+                  {children}
+                </strong>
+              ),
+
+              em: ({ children }) => (
+                <em className="italic text-white/85">
+                  {children}
+                </em>
+              ),
+
+              h1: ({ children }) => (
+                <h1 className="mb-4 mt-6 text-xl font-semibold text-white first:mt-0">
+                  {children}
+                </h1>
+              ),
+
+              h2: ({ children }) => (
+                <h2 className="mb-3 mt-6 text-lg font-semibold text-white first:mt-0">
+                  {children}
+                </h2>
+              ),
+
+              h3: ({ children }) => (
+                <h3 className="mb-3 mt-5 text-base font-semibold text-white first:mt-0">
+                  {children}
+                </h3>
+              ),
+
+              ul: ({ children }) => (
+                <ul className="mb-4 ml-5 list-disc space-y-1">
+                  {children}
+                </ul>
+              ),
+
+              ol: ({ children }) => (
+                <ol className="mb-4 ml-5 list-decimal space-y-1">
+                  {children}
+                </ol>
+              ),
+
+              li: ({ children }) => (
+                <li className="pl-1">
+                  {children}
+                </li>
+              ),
+
+              blockquote: ({ children }) => (
+                <blockquote className="my-4 border-l-2 border-blue-400/30 pl-4 text-white/55">
+                  {children}
+                </blockquote>
+              ),
+
+              code: ({ children }) => (
+                <code className="rounded-md border border-white/[0.08] bg-white/[0.05] px-1.5 py-0.5 font-mono text-[13px] text-blue-200">
+                  {children}
+                </code>
+              ),
+
+              pre: ({ children }) => (
+                <pre className="my-4 overflow-x-auto rounded-xl border border-white/[0.08] bg-[#080b12] p-4">
+                  {children}
+                </pre>
+              ),
+
+              a: ({ children, href }) => (
+                <a
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-blue-300 underline decoration-blue-300/30 underline-offset-4 hover:text-blue-200"
+                >
+                  {children}
+                </a>
+              ),
+
+              table: ({ children }) => (
+                <div className="my-5 w-full overflow-x-auto rounded-xl border border-white/[0.08]">
+                  <table className="w-full border-collapse text-left text-sm">
+                    {children}
+                  </table>
+                </div>
+              ),
+
+              thead: ({ children }) => (
+                <thead className="border-b border-white/[0.08] bg-white/[0.03]">
+                  {children}
+                </thead>
+              ),
+
+              th: ({ children }) => (
+                <th className="px-4 py-3 font-semibold text-white/90">
+                  {children}
+                </th>
+              ),
+
+              td: ({ children }) => (
+                <td className="border-t border-white/[0.06] px-4 py-3 text-white/65">
+                  {children}
+                </td>
+              ),
+
+              hr: () => (
+                <hr className="my-6 border-white/[0.08]" />
+              ),
+            }}
+          >
+            {message.content}
+          </ReactMarkdown>
         </div>
 
         {/* Assistant actions */}
+
         <AIMessageActions
           copied={copiedId === message.id}
           onCopy={() => onCopyMessage(message)}
         />
 
         {/* Version navigation */}
+
         {hasVersions && (
           <div className="mt-2 flex items-center gap-1 text-white/25">
             <button

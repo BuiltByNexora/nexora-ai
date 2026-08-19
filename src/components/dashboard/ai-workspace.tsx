@@ -165,7 +165,7 @@ export function AIWorkspace() {
    * =============================================================
    */
 
-  function sendMessage(
+  async function sendMessage(
     text?: string,
     options?: {
       webSearch?: boolean;
@@ -178,27 +178,82 @@ export function AIWorkspace() {
     const useWebSearch =
       options?.webSearch ?? webSearch;
 
+    /*
+    * Keep the previous conversation as context.
+    *
+    * We intentionally limit this to the latest 20 messages
+    * so the request does not grow indefinitely.
+    */
+    const conversationHistory = messages
+      .slice(-20)
+      .map((item) => ({
+        role: item.role,
+        content: item.content,
+      }));
+
     const userMessage: AIMessageData = {
       id: createId(),
       role: "user",
       content,
     };
 
-    const assistantMessage: AIMessageData = {
-      id: createId(),
-      role: "assistant",
-      content: mockResponse(content),
-    };
-
+    /*
+    * Show the user's message immediately.
+    */
     setMessages((current) => [
       ...current,
       userMessage,
-      assistantMessage,
     ]);
 
     setMessage("");
-  }
 
+    try {
+      const response = await fetch("/api/ai/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: content,
+          webSearch: useWebSearch,
+          history: conversationHistory,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("AI request failed.");
+      }
+
+      const data = await response.json();
+
+      const assistantMessage: AIMessageData = {
+        id: createId(),
+        role: "assistant",
+        content:
+          data.message ??
+          "Nexora could not generate a response.",
+      };
+
+      setMessages((current) => [
+        ...current,
+        assistantMessage,
+      ]);
+    } catch (error) {
+      console.error("Nexora AI error:", error);
+
+      const assistantMessage: AIMessageData = {
+        id: createId(),
+        role: "assistant",
+        content:
+          "Something went wrong while connecting to Nexora AI. Please try again.",
+      };
+
+      setMessages((current) => [
+        ...current,
+        assistantMessage,
+      ]);
+    }
+  }
   /*
    * =============================================================
    * START EDITING
@@ -245,7 +300,7 @@ export function AIWorkspace() {
    * Nothing is deleted.
    */
 
-  function saveEdit(messageId: string) {
+  async function saveEdit(messageId: string) {
     const updatedText = editingText.trim();
 
     if (!updatedText) return;
@@ -296,14 +351,48 @@ export function AIWorkspace() {
     };
 
     /*
-     * Generate the new assistant response.
-     */
+    * Generate the new assistant response using
+    * the real Nexora AI API.
+    */
 
-    const newAssistantMessage: AIMessageData = {
-      id: createId(),
-      role: "assistant",
-      content: mockResponse(updatedText),
-    };
+    let newAssistantMessage: AIMessageData;
+
+    try {
+      const response = await fetch("/api/ai/chat", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          message: updatedText,
+          webSearch,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error("AI request failed.");
+      }
+
+      const data = await response.json();
+
+      newAssistantMessage = {
+        id: createId(),
+        role: "assistant",
+        content:
+          data.message ??
+          "Nexora could not generate a response.",
+      };
+    } catch (error) {
+      console.error("Nexora edit error:", error);
+
+      newAssistantMessage = {
+        id: createId(),
+        role: "assistant",
+        content:
+          "Something went wrong while generating the updated response. Please try again.",
+      };
+    }
+    
 
     /*
      * Find an existing version group.
