@@ -95,6 +95,8 @@ export function AIWorkspace() {
   */
 
   const bottomRef = useRef<HTMLDivElement>(null);
+  
+  const composerRef = useRef<HTMLDivElement>(null);
 
   const [showScrollDown, setShowScrollDown] = useState(false);
 
@@ -120,9 +122,19 @@ export function AIWorkspace() {
   }, []);
 
   function scrollToBottom() {
-    bottomRef.current?.scrollIntoView({
+    if (!bottomRef.current) return;
+
+    const composerHeight =
+      composerRef.current?.getBoundingClientRect().height ?? 0;
+
+    const targetTop =
+      bottomRef.current.getBoundingClientRect().top +
+      window.scrollY -
+      (window.innerHeight - composerHeight - 24);
+
+    window.scrollTo({
+      top: Math.max(0, targetTop),
       behavior: "smooth",
-      block: "end",
     });
   }
 
@@ -638,7 +650,10 @@ export function AIWorkspace() {
 
           {/* Composer */}
 
-          <div className="sticky bottom-0 bg-[#03050b]/90 pb-5 pt-3 backdrop-blur-xl sm:pb-7">
+          <div
+            ref={composerRef}
+            className="relative sticky bottom-0 bg-[#03050b]/90 pb-5 pt-3 backdrop-blur-xl sm:pb-7"
+          >
             {showScrollDown && (
               <button
                 type="button"
