@@ -48,7 +48,10 @@ export function AIWorkspace() {
 
   const [message, setMessage] = useState("");
 
+  const [webSearch, setWebSearch] = useState(false);
+
   const [messages, setMessages] = useState<AIMessageData[]>([]);
+  
 
   /*
    * =============================================================
@@ -551,6 +554,8 @@ export function AIWorkspace() {
           setMessage={setMessage}
           onSend={() => sendMessage()}
           onKeyDown={handleComposerKeyDown}
+          webSearch={webSearch}
+          setWebSearch={setWebSearch}
         />
       ) : (
         /*
@@ -670,6 +675,8 @@ export function AIWorkspace() {
               setMessage={setMessage}
               onSend={() => sendMessage()}
               onKeyDown={handleComposerKeyDown}
+              webSearch={webSearch}
+              setWebSearch={setWebSearch}
             />
 
             <p className="mt-2 text-center text-[10px] text-white/15">

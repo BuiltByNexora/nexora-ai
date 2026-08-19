@@ -1,6 +1,7 @@
 "use client";
 
 import { Sparkles } from "lucide-react";
+import type { Dispatch, SetStateAction } from "react";
 
 import { AIComposer } from "@/components/dashboard/ai/ai-composer";
 import { AISuggestions } from "@/components/dashboard/ai/ai-suggestions";
@@ -12,6 +13,8 @@ type AIEmptyStateProps = {
   onKeyDown: (
     event: React.KeyboardEvent<HTMLTextAreaElement>,
   ) => void;
+  webSearch: boolean;
+  setWebSearch: Dispatch<SetStateAction<boolean>>;
 };
 
 export function AIEmptyState({
@@ -19,6 +22,8 @@ export function AIEmptyState({
   setMessage,
   onSend,
   onKeyDown,
+  webSearch,
+  setWebSearch,
 }: AIEmptyStateProps) {
   return (
     <div className="mx-auto flex w-full max-w-5xl flex-1 flex-col justify-center py-16 sm:py-20">
@@ -53,6 +58,8 @@ export function AIEmptyState({
           setMessage={setMessage}
           onSend={onSend}
           onKeyDown={onKeyDown}
+          webSearch={webSearch}
+          setWebSearch={setWebSearch}
         />
 
         <p className="mt-3 text-center text-[11px] text-white/20">
