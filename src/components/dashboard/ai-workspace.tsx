@@ -165,10 +165,18 @@ export function AIWorkspace() {
    * =============================================================
    */
 
-  function sendMessage(text?: string) {
+  function sendMessage(
+    text?: string,
+    options?: {
+      webSearch?: boolean;
+    },
+  ) {
     const content = (text ?? message).trim();
 
     if (!content) return;
+
+    const useWebSearch =
+      options?.webSearch ?? webSearch;
 
     const userMessage: AIMessageData = {
       id: createId(),
